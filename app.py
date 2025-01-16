@@ -204,14 +204,11 @@ streamlit_analytics.start_tracking()
 # Display chat interface
 with input_section:
     options = [
-        "Identify top trends in the tech industry relevant to gen ai",
-        "Find emerging technologies and their potential impact on job opportunities",
         "Summarize my resume",
         "Create a career path visualization based on my skills and interests from my resume",
-        "GenAI Jobs at Microsoft",
-        "Job Search GenAI jobs in India.",
+        "Show me jobs that fit my resume in Cleveland County, Oklahoma",
         "Analyze my resume and suggest a suitable job role and search for relevant job listings",
-        "Generate a cover letter for my resume.",
+        "Generate a cover letter for my resume",
     ]
     icons = ["🔍", "🌐", "📝", "📈", "💼", "🌟", "✉️", "🧠  "]
 
@@ -230,7 +227,7 @@ with input_section:
     with st.form(key="query_form", clear_on_submit=True):
         user_input_query = st.text_input(
             "Query:",
-            value=(selected_query if selected_query else "Detail analysis of latest layoff news India?"),
+            value=(selected_query if selected_query else "Summarize my resume"),
             placeholder="📝 Write your query or select from the above",
             key="input",
         )
