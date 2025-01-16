@@ -15,6 +15,14 @@ import shutil
 
 load_dotenv()
 
+# Styling for Streamlit app
+st.markdown("""
+<style>
+.stAppHeader { display: none !important; }
+.st-emotion-cache-12fmjuu.e10jh26i0 { display: none !important; }
+</style>
+""", unsafe_allow_html=True)
+
 # Set OpenAI API Key from Streamlit secrets
 os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
