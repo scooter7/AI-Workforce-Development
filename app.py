@@ -31,6 +31,13 @@ os.environ["LINKEDIN_SEARCH"] = st.secrets.get("LINKEDIN_JOB_SEARCH", "")
 # Page configuration
 st.set_page_config(layout="wide")
 st.title("Career Assistant - 👨‍💼")
+# Styling for Streamlit app
+st.markdown("""
+<style>
+.stAppHeader { display: none !important; }
+.st-emotion-cache-12fmjuu.e10jh26i0 { display: none !important; }
+</style>
+""", unsafe_allow_html=True)
 
 streamlit_analytics.start_tracking()
 
