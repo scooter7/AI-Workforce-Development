@@ -28,8 +28,7 @@ os.environ["LINKEDIN_SEARCH"] = st.secrets.get("LINKEDIN_JOB_SEARCH", "")
 
 # Page configuration
 st.set_page_config(layout="wide")
-st.title("GenAI Career Assistant - 👨‍💼")
-st.markdown("[Connect with me on LinkedIn](https://www.linkedin.com/in/aman-varyani-885725181/)")
+st.title("Career Assistant - 👨‍💼")
 
 streamlit_analytics.start_tracking()
 
