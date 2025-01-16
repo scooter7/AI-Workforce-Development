@@ -15,6 +15,9 @@ import shutil
 
 load_dotenv()
 
+# Set OpenAI API Key from Streamlit secrets
+os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+
 # Set environment variables from Streamlit secrets or .env
 os.environ["LINKEDIN_EMAIL"] = st.secrets.get("LINKEDIN_EMAIL", "")
 os.environ["LINKEDIN_PASS"] = st.secrets.get("LINKEDIN_PASS", "")
@@ -40,7 +43,7 @@ if not os.path.exists(temp_dir):
 
 # Add dummy resume if it does not exist
 if not os.path.exists(dummy_resume_path):
-    default_resume_path = "path/to/your/dummy_resume.pdf"
+    default_resume_path = "https://github.com/scooter7/AI-Workforce-Development/blob/0f531500fc4ede3862ff5232a566455cc549e226/dummy_resume.pdf"
     shutil.copy(default_resume_path, dummy_resume_path)
 
 # Sidebar - File Upload
@@ -59,71 +62,12 @@ with open(filepath, "wb") as f:
 
 st.markdown("**Resume uploaded successfully!**")
 
-# Sidebar - Service Provider Selection
-service_provider = st.sidebar.selectbox(
-    "Service Provider",
-    ("groq (llama-3.1-70b-versatile)", "openai"),
-)
-streamlit_analytics.stop_tracking()
-
-# Not to track the key
-if service_provider == "openai":
-    # Sidebar - OpenAI Configuration
-    api_key_openai = st.sidebar.text_input(
-        "OpenAI API Key",
-        st.session_state.get("OPENAI_API_KEY", ""),
-        type="password",
-    )
-    model_openai = st.sidebar.selectbox(
-        "OpenAI Model",
-        ("gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"),
-    )
-    settings = {
-        "model": model_openai,
-        "model_provider": "openai",
-        "temperature": 0.3,
-    }
-    st.session_state["OPENAI_API_KEY"] = api_key_openai
-    os.environ["OPENAI_API_KEY"] = st.session_state["OPENAI_API_KEY"]
-
-else:
-    # Toggle visibility for Groq API Key input
-    if "groq_key_visible" not in st.session_state:
-        st.session_state["groq_key_visible"] = False
-
-    if st.sidebar.button("Enter Groq API Key (optional)"):
-        st.session_state["groq_key_visible"] = True
-
-    if st.session_state["groq_key_visible"]:
-        api_key_groq = st.sidebar.text_input("Groq API Key", type="password")
-        st.session_state["GROQ_API_KEY"] = api_key_groq
-        os.environ["GROQ_API_KEY"] = api_key_groq
-
-    settings = {
-        "model": "llama-3.1-70b-versatile",
-        "model_provider": "groq",
-        "temperature": 0.3,
-    }
-
-# Sidebar - Service Provider Note
-st.sidebar.markdown(
-    """
-    **Note:** \n
-    This multi-agent system works best with OpenAI. llama 3.1 may not always produce optimal results.\n
-    Any key provided will not be stored or shared it will be used only for the current session.
-    """
-)
-st.sidebar.markdown(
-    """
-    <div style="padding:10px 0;">
-        If you like the project, give a 
-        <a href="https://github.com/amanv1906/GENAI-CareerAssistant-Multiagent" target="_blank" style="text-decoration:none;">
-            ⭐ on GitHub
-        </a>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+# Define OpenAI Model settings
+settings = {
+    "model": "gpt-4o-mini",
+    "model_provider": "openai",
+    "temperature": 0.3,
+}
 
 # Create the agent flow
 flow_graph = define_graph()
@@ -208,7 +152,7 @@ with input_section:
         "Analyze my resume and suggest a suitable job role and search for relevant job listings",
         "Generate a cover letter for my resume",
     ]
-    icons = ["🔍", "🌐", "📝", "📈", "💼", "🌟", "✉️", "🧠  "]
+    icons = ["🔍", "🌐", "📝", "📈", "💼"]
 
     selected_query = pills(
         "Pick a question for query:",
@@ -234,10 +178,6 @@ with input_section:
     if submit_query_button:
         if not uploaded_document:
             st.error("Please upload your resume before submitting a query.")
-
-        elif service_provider == "openai" and not st.session_state["OPENAI_API_KEY"]:
-            st.error("Please enter your OpenAI API key before submitting a query.")
-
         elif user_input_query:
             # Process the query as usual if resume is uploaded
             chat_output = execute_chat_conversation(user_input_query, flow_graph)
