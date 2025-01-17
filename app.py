@@ -176,7 +176,7 @@ with input_section:
     with st.form(key="query_form", clear_on_submit=True):
         user_input_query = st.text_input(
             "Query:",
-            value=(selected_query if selected_query else "Summarize my resume"),
+            value=(selected_query if selected_query else ""),
             placeholder="📝 Write your query or select from the above",
             key="input",
         )
