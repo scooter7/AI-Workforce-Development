@@ -195,7 +195,7 @@ def execute_chat_conversation(user_input, graph):
     callback_handler_instance = initialize_callback_handler(st.container())
 
     try:
-        # Invoke the graph
+        # Invoke the graph with suppressed intermediate steps
         output = graph.invoke(
             {
                 "messages": list(message_history.messages) + [user_input],
@@ -206,7 +206,7 @@ def execute_chat_conversation(user_input, graph):
             {"recursion_limit": 30},
         )
         
-        # Extract the final response message
+        # Extract only the final response message
         if isinstance(output, str):
             message_output = output  # Handle direct string response
         elif "messages" in output and isinstance(output["messages"], list):
@@ -216,11 +216,10 @@ def execute_chat_conversation(user_input, graph):
         else:
             raise ValueError("Unexpected response format from graph.invoke")
 
-        # Update message history
-        message_history.clear()
-        if "messages" in output and isinstance(output["messages"], list):
-            message_history.add_messages(output["messages"])
-    
+        # Store only the final response
+        st.session_state["user_query_history"].append(user_input)
+        st.session_state["response_history"].append(message_output)
+
     except Exception as exc:
         return ":( Sorry, an error occurred. Please try again."
 
@@ -280,7 +279,7 @@ with input_section:
             st.session_state["last_input"] = user_input_query  # Save the latest input
             st.session_state["active_option_index"] = None
 
-# Display chat history
+# Display chat history (only user query and final bot response)
 if st.session_state["response_history"]:
     with conversation_container:
         for i in range(len(st.session_state["response_history"])):
@@ -295,8 +294,8 @@ if st.session_state["response_history"]:
                 if hasattr(st.session_state["response_history"][i], "content")
                 else st.session_state["response_history"][i]
             )
-            
-            # Display messages
+
+            # Display messages without intermediate processing steps
             message(
                 user_message,
                 is_user=True,
