@@ -191,47 +191,29 @@ def initialize_callback_handler(main_container: DeltaGenerator):
     return streamlit_callback_instance
 
 def execute_chat_conversation(user_input, graph):
-    # Initialize the callback handler
-    callback_handler_instance = initialize_callback_handler(st.container())
+    callback_handler_instance = CustomStreamlitCallbackHandler(st.container())
 
     try:
-        # Invoke the agent and get response
         output = graph.invoke(
             {
                 "messages": list(message_history.messages) + [user_input],
                 "user_input": user_input,
                 "config": settings,
-                "callback": callback_handler_instance,  # Suppress intermediate steps
+                "callback": callback_handler_instance,
             },
             {"recursion_limit": 30},
         )
 
-        # Extract only text content (prevent JSON serialization errors)
-        if isinstance(output, str):
-            message_output = output.strip()  # Direct response
-        elif isinstance(output, dict) and "messages" in output:
-            messages = [
-                msg["content"] if isinstance(msg, dict) and "content" in msg else str(msg)
-                for msg in output["messages"]
-            ]
-            message_output = messages[-1] if messages else "Error: No valid response received."
+        final_response = callback_handler_instance.final_response
+        if final_response:
+            message_history.add_message(final_response)  # Store only the final output
         else:
-            message_output = "Error: Unexpected response format."
+            final_response = "An error occurred. Please try again."
 
-        # Ensure the chat history does NOT repeat responses
-        if "last_input" in st.session_state and st.session_state["last_input"] == user_input:
-            return  # Prevent duplicate entries
+    except Exception:
+        final_response = "An error occurred. Please try again."
 
-        # Convert HumanMessage objects to strings before storing them
-        st.session_state["user_query_history"].append(str(user_input))
-        st.session_state["response_history"].append(str(message_output))
-        st.session_state["last_input"] = user_input  # Prevent duplicates
-
-    except Exception as exc:
-        return ":( Sorry, an error occurred. Please try again."
-
-    # Return final response
-    return message_output
+    return final_response
 
 # Clear Chat functionality
 if st.button("Clear Chat"):
@@ -287,25 +269,14 @@ with input_section:
             st.session_state["last_input"] = user_input_query  # Save the latest input
             st.session_state["active_option_index"] = None
 
-# Display chat history (only latest user query and final response)
+# Display only the final response
 if st.session_state["response_history"]:
+    final_response = st.session_state["response_history"][-1]
     with conversation_container:
-        for i in range(len(st.session_state["response_history"])):
-            # Convert any non-string objects to strings
-            user_message = str(st.session_state["user_query_history"][i])
-            response_message = str(st.session_state["response_history"][i])
-
-            # Display user query and final response (no intermediate steps)
-            message(
-                user_message,
-                is_user=True,
-                key=f"user_{i}",
-                avatar_style="fun-emoji",
-            )
-            message(
-                response_message,
-                key=f"response_{i}",
-                avatar_style="bottts",
-            )
+        message(
+            final_response,
+            key="final_response",
+            avatar_style="bottts",
+        )
 
 streamlit_analytics.stop_tracking()
