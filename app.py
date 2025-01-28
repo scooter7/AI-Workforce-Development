@@ -195,7 +195,7 @@ def execute_chat_conversation(user_input, graph):
     callback_handler_instance = initialize_callback_handler(st.container())
 
     try:
-        # Invoke the graph with suppressed thinking process
+        # Invoke the graph
         output = graph.invoke(
             {
                 "messages": list(message_history.messages) + [user_input],
@@ -206,19 +206,26 @@ def execute_chat_conversation(user_input, graph):
             {"recursion_limit": 30},
         )
         
-        # Extract only the final response message
-        message_output = output.get("messages")[-1]
-        messages_list = output.get("messages")
+        # Extract the final response message
+        if isinstance(output, str):
+            message_output = output  # Handle direct string response
+        elif "messages" in output and isinstance(output["messages"], list):
+            message_output = output["messages"][-1]  # Get the last message
+            if isinstance(message_output, dict) and "content" in message_output:
+                message_output = message_output["content"]
+        else:
+            raise ValueError("Unexpected response format from graph.invoke")
 
         # Update message history
         message_history.clear()
-        message_history.add_messages(messages_list)
+        if "messages" in output and isinstance(output["messages"], list):
+            message_history.add_messages(output["messages"])
     
     except Exception as exc:
         return ":( Sorry, an error occurred. Please try again."
 
-    # Return only the final output content
-    return message_output.content
+    # Return the final output content as a string
+    return message_output
 
 # Clear Chat functionality
 if st.button("Clear Chat"):
@@ -266,7 +273,7 @@ with input_section:
         if not uploaded_document:
             st.error("Please upload your resume before submitting a query.")
         elif user_input_query:
-            # Process the query as usual if resume is uploaded
+            # Process the query
             chat_output = execute_chat_conversation(user_input_query, flow_graph)
             st.session_state["user_query_history"].append(user_input_query)
             st.session_state["response_history"].append(chat_output)
