@@ -191,25 +191,33 @@ def initialize_callback_handler(main_container: DeltaGenerator):
     return streamlit_callback_instance
 
 def execute_chat_conversation(user_input, graph):
+    # Initialize the callback handler but suppress intermediate steps
     callback_handler_instance = initialize_callback_handler(st.container())
-    callback_handler = callback_handler_instance
+
     try:
+        # Invoke the graph with suppressed thinking process
         output = graph.invoke(
             {
                 "messages": list(message_history.messages) + [user_input],
                 "user_input": user_input,
                 "config": settings,
-                "callback": callback_handler,
+                "callback": callback_handler_instance,
             },
             {"recursion_limit": 30},
         )
+        
+        # Extract only the final response message
         message_output = output.get("messages")[-1]
         messages_list = output.get("messages")
+
+        # Update message history
         message_history.clear()
         message_history.add_messages(messages_list)
-
+    
     except Exception as exc:
-        return ":( Sorry, Some error occurred. Can you please try again?"
+        return ":( Sorry, an error occurred. Please try again."
+
+    # Return only the final output content
     return message_output.content
 
 # Clear Chat functionality
@@ -219,7 +227,7 @@ if st.button("Clear Chat"):
     message_history.clear()
     st.rerun()  # Refresh the app to reflect the cleared chat
 
-# for tracking the query.
+# For tracking the query
 streamlit_analytics.start_tracking()
 
 # Display chat interface
