@@ -191,47 +191,52 @@ def initialize_callback_handler(main_container: DeltaGenerator):
     return streamlit_callback_instance
 
 def execute_chat_conversation(user_input, graph):
-    # Initialize the callback handler but suppress intermediate steps
+    # Initialize the callback handler
     callback_handler_instance = initialize_callback_handler(st.container())
 
     try:
-        # Invoke the graph with suppressed intermediate steps
+        # Invoke the agent and get response
         output = graph.invoke(
             {
                 "messages": list(message_history.messages) + [user_input],
                 "user_input": user_input,
                 "config": settings,
-                "callback": callback_handler_instance,
+                "callback": callback_handler_instance,  # Suppress intermediate steps
             },
             {"recursion_limit": 30},
         )
-        
-        # Extract only the final response message
+
+        # Ensure the output is valid
         if isinstance(output, str):
-            message_output = output  # Handle direct string response
-        elif "messages" in output and isinstance(output["messages"], list):
-            message_output = output["messages"][-1]  # Get the last message
-            if isinstance(message_output, dict) and "content" in message_output:
-                message_output = message_output["content"]
+            message_output = output.strip()  # Direct response
+        elif isinstance(output, dict) and "messages" in output:
+            messages = [msg["content"] for msg in output["messages"] if isinstance(msg, dict) and "content" in msg]
+            message_output = messages[-1] if messages else "Error: No valid response received."
         else:
-            raise ValueError("Unexpected response format from graph.invoke")
+            message_output = "Error: Unexpected response format."
+
+        # Ensure the chat history does NOT repeat responses
+        if "last_input" in st.session_state and st.session_state["last_input"] == user_input:
+            return  # Prevent duplicate entries
 
         # Store only the final response
         st.session_state["user_query_history"].append(user_input)
         st.session_state["response_history"].append(message_output)
+        st.session_state["last_input"] = user_input  # Prevent duplicates
 
     except Exception as exc:
         return ":( Sorry, an error occurred. Please try again."
 
-    # Return the final output content as a string
+    # Return final response
     return message_output
 
 # Clear Chat functionality
 if st.button("Clear Chat"):
     st.session_state["user_query_history"] = []
     st.session_state["response_history"] = []
+    st.session_state["last_input"] = None  # Prevent accidental duplicate queries
     message_history.clear()
-    st.rerun()  # Refresh the app to reflect the cleared chat
+    st.rerun()  # Refresh app to reflect cleared chat
 
 # For tracking the query
 streamlit_analytics.start_tracking()
@@ -279,32 +284,24 @@ with input_section:
             st.session_state["last_input"] = user_input_query  # Save the latest input
             st.session_state["active_option_index"] = None
 
-# Display chat history (only user query and final bot response)
+# Display chat history (only latest user query and final response)
 if st.session_state["response_history"]:
     with conversation_container:
         for i in range(len(st.session_state["response_history"])):
-            # Extract string content from messages
-            user_message = (
-                st.session_state["user_query_history"][i].content
-                if hasattr(st.session_state["user_query_history"][i], "content")
-                else st.session_state["user_query_history"][i]
-            )
-            response_message = (
-                st.session_state["response_history"][i].content
-                if hasattr(st.session_state["response_history"][i], "content")
-                else st.session_state["response_history"][i]
-            )
+            # Extract only string messages (ignore agent processing steps)
+            user_message = st.session_state["user_query_history"][i]
+            response_message = st.session_state["response_history"][i]
 
-            # Display messages without intermediate processing steps
+            # Display user query and final response (no intermediate steps)
             message(
                 user_message,
                 is_user=True,
-                key=str(i) + "_user",
+                key=f"user_{i}",
                 avatar_style="fun-emoji",
             )
             message(
                 response_message,
-                key=str(i),
+                key=f"response_{i}",
                 avatar_style="bottts",
             )
 
