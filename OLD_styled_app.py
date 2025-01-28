@@ -191,35 +191,42 @@ def initialize_callback_handler(main_container: DeltaGenerator):
     return streamlit_callback_instance
 
 def execute_chat_conversation(user_input, graph):
-    callback_handler_instance = initialize_callback_handler(st.container())
-    callback_handler = callback_handler_instance
+    callback_handler_instance = CustomStreamlitCallbackHandler(st.container())
+
     try:
+        # Invoke the graph with callback handler
         output = graph.invoke(
             {
                 "messages": list(message_history.messages) + [user_input],
                 "user_input": user_input,
                 "config": settings,
-                "callback": callback_handler,
+                "callback": callback_handler_instance,
             },
             {"recursion_limit": 30},
         )
-        message_output = output.get("messages")[-1]
+
+        # Store only the final response
+        final_response = callback_handler_instance.final_response
         messages_list = output.get("messages")
+
+        # Update message history
         message_history.clear()
         message_history.add_messages(messages_list)
 
     except Exception as exc:
-        return ":( Sorry, Some error occurred. Can you please try again?"
-    return message_output.content
+        return ":( Sorry, an error occurred. Please try again."
+
+    return final_response  # Return only the final response, suppressing agent steps
 
 # Clear Chat functionality
 if st.button("Clear Chat"):
     st.session_state["user_query_history"] = []
     st.session_state["response_history"] = []
+    st.session_state["last_input"] = None  # Prevent accidental duplicate queries
     message_history.clear()
-    st.rerun()  # Refresh the app to reflect the cleared chat
+    st.rerun()  # Refresh app to reflect cleared chat
 
-# for tracking the query.
+# For tracking the query
 streamlit_analytics.start_tracking()
 
 # Display chat interface
@@ -258,27 +265,21 @@ with input_section:
         if not uploaded_document:
             st.error("Please upload your resume before submitting a query.")
         elif user_input_query:
-            # Process the query as usual if resume is uploaded
+            # Process the query
             chat_output = execute_chat_conversation(user_input_query, flow_graph)
             st.session_state["user_query_history"].append(user_input_query)
             st.session_state["response_history"].append(chat_output)
             st.session_state["last_input"] = user_input_query  # Save the latest input
             st.session_state["active_option_index"] = None
 
-# Display chat history
+# Display only the final response
 if st.session_state["response_history"]:
+    final_response = st.session_state["response_history"][-1]
     with conversation_container:
-        for i in range(len(st.session_state["response_history"])):
-            message(
-                st.session_state["user_query_history"][i],
-                is_user=True,
-                key=str(i) + "_user",
-                avatar_style="fun-emoji",
-            )
-            message(
-                st.session_state["response_history"][i],
-                key=str(i),
-                avatar_style="bottts",
-            )
+        message(
+            final_response,
+            key="final_response",
+            avatar_style="bottts",
+        )
 
 streamlit_analytics.stop_tracking()
