@@ -41,20 +41,20 @@ body {
 }
 
 /* Sidebar styling (black background with white text) */
-.stMain.st-emotion-cache-bm2z3a.ekr3hml1 {
-    background-color: #121212 !important; /* Black background */
+.st-emotion-cache-6qob1r.e1dbuyne8 {
+    background-color: #121212 !important; /* Black sidebar background */
     color: #ffffff !important; /* White text */
 }
 
-.stMain.st-emotion-cache-bm2z3a.ekr3hml1 h2, 
-.stMain.st-emotion-cache-bm2z3a.ekr3hml1 h3, 
-.stMain.st-emotion-cache-bm2z3a.ekr3hml1 h4 {
-    color: #f2a65a !important; /* Orange headings */
+.st-emotion-cache-6qob1r.e1dbuyne8 h2, 
+.st-emotion-cache-6qob1r.e1dbuyne8 h3, 
+.st-emotion-cache-6qob1r.e1dbuyne8 h4 {
+    color: #f2a65a !important; /* Orange headings in sidebar */
 }
 
-/* Main page content styling (white background) */
+/* Main content area (white background with black text) */
 .stApp {
-    background-color: #ffffff !important; /* White background */
+    background-color: #ffffff !important; /* White main content background */
     color: #000000 !important; /* Black text */
 }
 
