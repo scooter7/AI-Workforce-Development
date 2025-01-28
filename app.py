@@ -40,20 +40,22 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
-/* Sidebar styling */
-.css-1d391kg {
-    background-color: #121212 !important; /* Black sidebar */
-    color: #ffffff !important; /* White text in sidebar */
+/* Sidebar styling (black background with white text) */
+.stMain.st-emotion-cache-bm2z3a.ekr3hml1 {
+    background-color: #121212 !important; /* Black background */
+    color: #ffffff !important; /* White text */
 }
 
-.css-1d391kg h2, .css-1d391kg h3, .css-1d391kg h4 {
-    color: #f2a65a !important; /* Orange headings in sidebar */
+.stMain.st-emotion-cache-bm2z3a.ekr3hml1 h2, 
+.stMain.st-emotion-cache-bm2z3a.ekr3hml1 h3, 
+.stMain.st-emotion-cache-bm2z3a.ekr3hml1 h4 {
+    color: #f2a65a !important; /* Orange headings */
 }
 
-/* Main page content styling */
+/* Main page content styling (white background) */
 .stApp {
-    background-color: #ffffff !important; /* White main background */
-    color: #000000 !important; /* Black text on main page */
+    background-color: #ffffff !important; /* White background */
+    color: #000000 !important; /* Black text */
 }
 
 /* Button styling */
