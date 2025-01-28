@@ -30,7 +30,9 @@ os.environ["LINKEDIN_SEARCH"] = st.secrets.get("LINKEDIN_JOB_SEARCH", "")
 
 # Page configuration
 st.set_page_config(layout="wide")
-st.title("Career Assistant - 👨‍💼")
+
+# Embed YouTube Video in place of title
+st.video("https://www.youtube.com/watch?v=zhpcgpqWc1Q")
 
 # Styling for Streamlit app
 st.markdown("""
