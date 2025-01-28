@@ -1,24 +1,14 @@
-from typing import Any
 from langchain_community.callbacks import StreamlitCallbackHandler
-from streamlit.external.langchain.streamlit_callback_handler import (
-    StreamlitCallbackHandler,
-    LLMThought,
-)
-from langchain.schema import AgentAction
 
 class CustomStreamlitCallbackHandler(StreamlitCallbackHandler):
-    def write_agent_name(self, name: str):
-        """Prevent the agent name from being displayed."""
-        pass  # Do nothing
+    def __init__(self, parent_container):
+        super().__init__(parent_container)
+        self.final_response = None  # Store only the final response
 
-    def on_thought(self, thought: LLMThought):
-        """Suppress 'thinking' messages from showing in the UI."""
-        pass  # Ignore intermediate steps
+    def on_llm_new_token(self, token: str, **kwargs):
+        """Override to suppress intermediate tokens."""
+        pass  # Do nothing to prevent intermediate outputs
 
-    def on_action(self, action: AgentAction):
-        """Prevent intermediate agent steps from being displayed."""
-        pass  # Do nothing
-
-    def on_result(self, result: Any):
-        """Ensure only the final response is displayed."""
-        self._parent_container.write(result)  # Only show the final result
+    def on_chain_end(self, outputs, **kwargs):
+        """Store only the final response from the agent."""
+        self.final_response = outputs.get("text", None)
