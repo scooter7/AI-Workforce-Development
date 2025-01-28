@@ -191,7 +191,7 @@ def initialize_callback_handler(main_container: DeltaGenerator):
     return streamlit_callback_instance
 
 def execute_chat_conversation(user_input, graph):
-    callback_handler_instance = CustomStreamlitCallbackHandler(st.container())
+    callback_handler_instance = CustomStreamlitCallbackHandler()
 
     try:
         output = graph.invoke(
@@ -199,7 +199,7 @@ def execute_chat_conversation(user_input, graph):
                 "messages": list(message_history.messages) + [user_input],
                 "user_input": user_input,
                 "config": settings,
-                "callback": callback_handler_instance,
+                "callback": callback_handler_instance,  # Use the updated handler
             },
             {"recursion_limit": 30},
         )
