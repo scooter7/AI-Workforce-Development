@@ -52,6 +52,11 @@ body {
     color: #f2a65a !important; /* Orange headings in sidebar */
 }
 
+/* Sidebar file uploader text */
+.st-emotion-cache-6qob1r.e1dbuyne8 .stFileUploader label {
+    color: #ffffff !important; /* White text for "Upload Your Resume" */
+}
+
 /* Main content area (white background with black text) */
 .stApp {
     background-color: #ffffff !important; /* White main content background */
