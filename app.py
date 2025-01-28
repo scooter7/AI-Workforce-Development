@@ -27,33 +27,79 @@ os.environ["LANGCHAIN_PROJECT"] = st.secrets.get("LANGCHAIN_PROJECT", "")
 os.environ["SERPER_API_KEY"] = st.secrets.get("SERPER_API_KEY", "")
 os.environ["FIRECRAWL_API_KEY"] = st.secrets.get("FIRECRAWL_API_KEY", "")
 os.environ["LINKEDIN_SEARCH"] = st.secrets.get("LINKEDIN_JOB_SEARCH", "")
+
 # Page configuration
 st.set_page_config(layout="wide")
 st.title("Career Assistant - 👨‍💼")
 
-# Link to external CSS file
-st.markdown("""
-    <link rel="stylesheet" href="styles.css?v=1">
-""", unsafe_allow_html=True)
-
-# Inline CSS as fallback or for debugging
+# Styling for Streamlit app
 st.markdown("""
 <style>
+/* General body styling */
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #121212 !important;
-    color: #ffffff !important;
 }
+
+/* Sidebar styling */
+.css-1d391kg {
+    background-color: #121212 !important; /* Black sidebar */
+    color: #ffffff !important; /* White text in sidebar */
+}
+
+.css-1d391kg h2, .css-1d391kg h3, .css-1d391kg h4 {
+    color: #f2a65a !important; /* Orange headings in sidebar */
+}
+
+/* Main page content styling */
 .stApp {
-    background-color: #121212 !important;
+    background-color: #ffffff !important; /* White main background */
+    color: #000000 !important; /* Black text on main page */
 }
+
+/* Button styling */
 .stButton button {
-    background-color: #f2a65a !important;
-    color: #000000 !important;
+    background-color: #f2a65a !important; /* Orange button background */
+    color: #000000 !important; /* Black button text */
     font-weight: bold !important;
     padding: 0.8rem 1.5rem !important;
     border-radius: 5px !important;
     transition: all 0.3s ease !important;
+}
+
+.stButton button:hover {
+    background-color: #ffa94d !important; /* Lighter orange on hover */
+    color: #ffffff !important; /* White button text on hover */
+}
+
+/* Input field styling */
+.stTextInput input {
+    background-color: #f9f9f9 !important; /* Light gray input background */
+    color: #000000 !important; /* Black text in input */
+    border: 1px solid #cccccc !important; /* Light gray border */
+    border-radius: 5px !important;
+    padding: 10px;
+}
+
+.stTextInput input:focus {
+    outline: none;
+    box-shadow: 0 0 5px #f2a65a !important; /* Orange focus effect */
+}
+
+/* Chat message styling */
+.chat-container .message-user {
+    background-color: #0a74da !important; /* Blue user message background */
+    color: #ffffff !important; /* White user message text */
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+}
+
+.chat-container .message-bot {
+    background-color: #f9f9f9 !important; /* Light gray bot message background */
+    color: #000000 !important; /* Black bot message text */
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
 }
 </style>
 """, unsafe_allow_html=True)
