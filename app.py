@@ -27,26 +27,36 @@ os.environ["LANGCHAIN_PROJECT"] = st.secrets.get("LANGCHAIN_PROJECT", "")
 os.environ["SERPER_API_KEY"] = st.secrets.get("SERPER_API_KEY", "")
 os.environ["FIRECRAWL_API_KEY"] = st.secrets.get("FIRECRAWL_API_KEY", "")
 os.environ["LINKEDIN_SEARCH"] = st.secrets.get("LINKEDIN_JOB_SEARCH", "")
-
 # Page configuration
 st.set_page_config(layout="wide")
 st.title("Career Assistant - 👨‍💼")
 
-# Styling for Streamlit app
+# Link to external CSS file
 st.markdown("""
-<style>
-.stAppHeader { display: none !important; }
-.st-emotion-cache-12fmjuu.e10jh26i0 { display: none !important; }
-</style>
+    <link rel="stylesheet" href="styles.css?v=1">
 """, unsafe_allow_html=True)
 
-# Link to external CSS file
-st.markdown(
-    """
-    <link rel="stylesheet" href="styles.css">
-    """,
-    unsafe_allow_html=True
-)
+# Inline CSS as fallback or for debugging
+st.markdown("""
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #121212 !important;
+    color: #ffffff !important;
+}
+.stApp {
+    background-color: #121212 !important;
+}
+.stButton button {
+    background-color: #f2a65a !important;
+    color: #000000 !important;
+    font-weight: bold !important;
+    padding: 0.8rem 1.5rem !important;
+    border-radius: 5px !important;
+    transition: all 0.3s ease !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 streamlit_analytics.start_tracking()
 
