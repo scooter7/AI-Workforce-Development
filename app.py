@@ -284,14 +284,27 @@ with input_section:
 if st.session_state["response_history"]:
     with conversation_container:
         for i in range(len(st.session_state["response_history"])):
+            # Extract string content from messages
+            user_message = (
+                st.session_state["user_query_history"][i].content
+                if hasattr(st.session_state["user_query_history"][i], "content")
+                else st.session_state["user_query_history"][i]
+            )
+            response_message = (
+                st.session_state["response_history"][i].content
+                if hasattr(st.session_state["response_history"][i], "content")
+                else st.session_state["response_history"][i]
+            )
+            
+            # Display messages
             message(
-                st.session_state["user_query_history"][i],
+                user_message,
                 is_user=True,
                 key=str(i) + "_user",
                 avatar_style="fun-emoji",
             )
             message(
-                st.session_state["response_history"][i],
+                response_message,
                 key=str(i),
                 avatar_style="bottts",
             )
