@@ -31,8 +31,19 @@ os.environ["LINKEDIN_SEARCH"] = st.secrets.get("LINKEDIN_JOB_SEARCH", "")
 # Page configuration
 st.set_page_config(layout="wide")
 
-# Embed YouTube Video in place of title
-st.video("https://www.youtube.com/watch?v=zhpcgpqWc1Q")
+# Embed YouTube Video with Custom Size (640x480)
+video_url = "https://www.youtube.com/embed/zhpcgpqWc1Q"  # Use embed link format
+
+st.markdown(
+    f"""
+    <div style="display: flex; justify-content: center;">
+        <iframe width="640" height="480" 
+        src="{video_url}" 
+        frameborder="0" allowfullscreen></iframe>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # Styling for Streamlit app
 st.markdown("""
