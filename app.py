@@ -206,11 +206,14 @@ def execute_chat_conversation(user_input, graph):
             {"recursion_limit": 30},
         )
 
-        # Ensure the output is valid
+        # Extract only text content (prevent JSON serialization errors)
         if isinstance(output, str):
             message_output = output.strip()  # Direct response
         elif isinstance(output, dict) and "messages" in output:
-            messages = [msg["content"] for msg in output["messages"] if isinstance(msg, dict) and "content" in msg]
+            messages = [
+                msg["content"] if isinstance(msg, dict) and "content" in msg else str(msg)
+                for msg in output["messages"]
+            ]
             message_output = messages[-1] if messages else "Error: No valid response received."
         else:
             message_output = "Error: Unexpected response format."
@@ -219,9 +222,9 @@ def execute_chat_conversation(user_input, graph):
         if "last_input" in st.session_state and st.session_state["last_input"] == user_input:
             return  # Prevent duplicate entries
 
-        # Store only the final response
-        st.session_state["user_query_history"].append(user_input)
-        st.session_state["response_history"].append(message_output)
+        # Convert HumanMessage objects to strings before storing them
+        st.session_state["user_query_history"].append(str(user_input))
+        st.session_state["response_history"].append(str(message_output))
         st.session_state["last_input"] = user_input  # Prevent duplicates
 
     except Exception as exc:
@@ -288,9 +291,9 @@ with input_section:
 if st.session_state["response_history"]:
     with conversation_container:
         for i in range(len(st.session_state["response_history"])):
-            # Extract only string messages (ignore agent processing steps)
-            user_message = st.session_state["user_query_history"][i]
-            response_message = st.session_state["response_history"][i]
+            # Convert any non-string objects to strings
+            user_message = str(st.session_state["user_query_history"][i])
+            response_message = str(st.session_state["response_history"][i])
 
             # Display user query and final response (no intermediate steps)
             message(
